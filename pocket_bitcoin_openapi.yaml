@@ -1,0 +1,388 @@
+openapi: 3.0.0
+info:
+  title: Pocket Bitcoin REST API
+  description: |
+    Generates working API wrappers and docs for the Pocket Bitcoin API. You must contact Pocket Bitcoin to get API credentials.
+    
+    This OpenAPI file was not created by Pocket Bitcoin nor is it supported by them. Use this as you wish, but be mindful this is unsupported and not necessarily production grade.
+  version: 1.0.0
+servers:
+  - url: https://api.pocketbitcoin.com
+externalDocs:
+  description: See here for the official Pocket Bitcoin API docs.
+  url: 'https://pocketbitcoin.com/developers/docs/rest/v1/resources'
+security:
+  - apikeyAuth: []
+paths:
+  /v1/challenges:
+    post:
+      tags:
+        - rest
+      operationId: create_challenge
+      summary: Create a challenge
+      description: Creates a random token to be used in a signed message in the create new order call.
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: {}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Challenge'
+  /v1/challenges/{id}:
+    get:
+      tags:
+        - rest
+      operationId: get_challenge
+      summary: Get a challenge
+      description: Fetches a challenge.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+          example: cd79cb50-4e83-49f9-a621-4cfc977b6229
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Challenge'
+  /v1/exchanges/{id}:
+    get:
+      tags:
+        - rest
+      operationId: get_exchange
+      summary: Get an exchange
+      description: Fetches an exchange event of Bitcoin and fiat.
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 2224e84f-662d-40ce-a988-6a8c4d92727e
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exchange'
+  /v1/orders:
+    post:
+      tags:
+        - rest
+      operationId: create_order
+      summary: Create an order
+      description: |
+        Creates an order with payment and payout instructions for buying Bitcoin.
+
+        The Bitcoin payout address must be confirmed by following these steps:
+          1. Get a challenge token
+          2. Append the challenge token to this "I confirm my bitcoin wallet. [YOUR_TOKEN_HERE]"
+          3. Sign the created message with the Bitcoin address receiving payout.
+          4. Populate the `signature` field with the signed message.
+
+        The following fields are optional:
+          * affiliate_id
+          * extended_public_key
+          * derivation_path
+          * gap_limit
+      requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+  /v1/orders/{id}:
+    patch:
+      tags:
+        - rest
+      operationId: update_order
+      summary: Update an order
+      description: Updates the `active`, `fee_rate`, or `affiliate_id` fields of a previously created order.
+      requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 1bac0a15-f968-4e3c-80f0-0871ef971cd8
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+    get:
+      tags:
+        - rest
+      operationId: get_order
+      summary: Get an order
+      description: Fetches an order.
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 1bac0a15-f968-4e3c-80f0-0871ef971cd8
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+components:
+  securitySchemes:
+    apikeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+  schemas:
+    Challenge:
+      title: Challenge
+      description: Challenges contain a randomly generated token. Use this token to create a signed message confirming ownership of a Bitcoin address that will receive the Bitcoin payout. 
+      type: object
+      properties:
+        id:
+          type: string
+          example: bcb83b7a-6547-464c-9e2e-682a0aaaa78c
+        token:
+          type: string
+          example: 7v7t4Fmb
+        expires_on:
+          type: string
+          format: date-time
+          example: 2022-01-10T00:25:11.123Z
+        completed_on:
+          type: string
+          format: date-time
+          example: 2022-01-10T00:26:11.123Z
+    Exchange:
+      title: Exchange
+      description: Exchanges are a swap of Bitcoin and fiat currency. Exchanges are automatically generated after a user makes a payment using the instructions from a previously generated Order.
+      type: object
+      properties:
+          id: 
+            type: string
+            example: a2d75998-5ee5-4501-a4cf-4e3788732b7a
+          order_id: 
+            type: string
+            example: 64decab6-4129-4fe7-9f6e-1db68283f5ce
+          fee_rate: 
+            type: number
+            format: float
+            example: 0.015
+          pair: 
+            type: string
+            example: btc/chf
+          type: 
+            type: string
+            example: buy
+          cost: 
+            type: number
+            format: float
+            example: 100.00
+          executed_on: 
+            type: string
+            format: date-time
+            example: 2021-09-15T14:35:10.122Z
+          amount: 
+            type: number
+            format: float
+            example: 0.00197000
+          rate: 
+            type: number
+            format: float
+            example: 50000.00
+          fee: 
+            type: number
+            format: float
+            example: 1.50
+          action:
+            type: object
+            properties:
+              code:
+                type: string
+                example: identification_required
+              identification_id:
+                type: string
+                example: 7bf967b5-3d34-4cd6-936c-6631811401d2
+          reason: 
+            type: object
+            properties:
+              code:
+                type: string
+                example: threshold_exceeded
+          payout: 
+            type: object
+            properties:
+              txid: 
+                type: string
+                example: c01c7a0fd270aa3876119098c0e2d51687a795efab99787e214d8a93ab9f8342
+              outpoint: 
+                type: integer
+                example: 1
+              bitcoin_address: 
+                type: string
+                example: bc1q5vvayqt3n4alhjaxy6ql4w2fs6r0y83rmvh3tg
+              derivation_path: 
+                type: string
+                example: null
+              block_height: 
+                type: integer
+                example: null
+              confirmed: 
+                type: boolean
+                example: false
+              fee: 
+                type: number
+                format: float
+                example: 0.00000190
+              amount: 
+                type: number
+                format: float
+                example: 0.0019681
+    Order:
+      title: Order
+      description: Orders are a long-living set of payment and payout instructions. Users can make multiple purchases(Exchanges) using the same Order.
+      type: object
+      required:
+        - active
+        - fee_rate
+        - payment_method
+        - payout_method
+      properties:
+        id:
+          type: string
+          example: 64decab6-4129-4fe7-9f6e-1db68283f5ce
+        active:
+          type: boolean
+          example: true
+        created_on:
+          type: string
+          format: date-time
+          example: 2021-09-10T04:55:36.887Z
+        affiliate_id:
+          type: string
+          example: 8ed13c2a-a8c6-4f0e-b43e-3fdbf1f094a6
+        fee_rate:
+          type: number
+          format: float
+          example: 0.03
+          minimum: 0.012
+          maximum: 0.045
+        payment_method:
+          $ref: '#/components/schemas/PaymentMethod'
+        payout_method:
+          $ref: '#/components/schemas/PayoutMethod'
+    PaymentMethod:
+      title: Payment Method
+      description: Payment methods are fiat payment instructions in order to purchase Bitcoin. Instructions will differ for EUR and CHF transactions. 
+        The payer must be sure to pay from the same bank account listed in `debitor_iban` and include the `creditor_reference` in the payment description field.
+      type: object
+      required:
+        - currency
+        - debitor_iban
+      properties:
+        currency: 
+          type: string
+          example: chf
+        debitor_iban: 
+          type: string
+          example: DE75512108001245126199
+        creditor_reference: 
+          type: string
+          example: RF18GW8K79
+        creditor_iban: 
+          type: string
+          example: CH9400778214768302002
+        creditor_bank_name: 
+          type: string
+          example: Luzerner Kantonalbank
+        creditor_bank_street: 
+          type: string
+          example: Pilatusstrasse 12
+        creditor_bank_postal_code: 
+          type: string
+          example: 6002
+        creditor_bank_town: 
+          type: string
+          example: Luzern
+        creditor_bank_country: 
+          type: string
+          example: CH
+        creditor_bank_bic: 
+          type: string
+          example: LUKBCH2260A
+        creditor_name: 
+          type: string
+          example: Pocket App
+        creditor_street: 
+          type: string
+          example: Industriestrasse 33
+        creditor_postal_code: 
+          type: string
+          example: 5242
+        creditor_town: 
+          type: string
+          example: Lupfig
+        creditor_country: 
+          type: string
+          example: CH
+        swiss_qr_bill_payload: 
+          type: string
+          example: null
+    PayoutMethod: 
+      title: Payout Method
+      description: Payout methods are Bitcoin payment instructions. Pocket Bitcoin will send Bitcoin to the address provided here.
+      type: object
+      required:
+        - bitcoin_address
+        - message
+        - signature
+      properties:
+        bitcoin_address: 
+          type: string
+          example: 17wvJajWQjoVJuJe31tuiDs4MmVeBfSvGY
+        message: 
+          type: string
+          example: I confirm my bitcoin wallet. [7v7t4Fmb]
+        signature: 
+          type: string
+          example: IKiJsfsAta7Id7Seq+j8EEfpFUj2LCVDRjQ+ZC3/akv+VfUznwmq9mkxQtvqz8NTr0t6VnmTBcsEhHLMQYixHZM=
+        extended_public_key: 
+          type: string
+          example: xpub6C9cxxj5hCqTY7sYeofQPA4nXuLJpL5xBL5F874n8hremDiwrWPsPBmxjJxHqBL7jwxKy33j4uJmHXQSNxRegEY2MukehJUe8s4mBkaFGBU
+        derivation_path: 
+          type: string
+          example: 0/1
+        gap_limit: 
+          type: string
+          example: null

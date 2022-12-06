@@ -1,0 +1,17 @@
+# sample_config.yaml
+
+# javascript
+projectName: pocket-bitcoin-api-js
+projectVersion: 1.0.0
+
+# python
+packageName: pocket_bitcoin
+packageUrl: https://abarron.com
+packageVersion: 1.0.0
+projectName: pocket-bitcoin-api
+
+# ruby
+gemName: pocket_bitcoin
+gemAuthor: Alex Barron
+gemHomepage: https://abarron.com
+gemVersion: 1.0.0

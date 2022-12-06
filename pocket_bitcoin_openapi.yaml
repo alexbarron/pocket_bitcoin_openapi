@@ -5,6 +5,9 @@ info:
     Generates working API wrappers and docs for the Pocket Bitcoin API. You must contact Pocket Bitcoin to get API credentials.
     
     This OpenAPI file was not created by Pocket Bitcoin nor is it supported by them. Use this as you wish, but be mindful this is unsupported and not necessarily production grade.
+
+    **Important**
+    You must prefix the Authorization header value with `client_id` before your key. This can be set in the API's configuration at initialization in either the `api_key_prefix` or `apiKeyPrefix` field depending on the language you're using. See `Getting Started` in the README of the generated library for how to set the prefix.
   version: 1.0.0
 servers:
   - url: https://api.pocketbitcoin.com
@@ -164,6 +167,7 @@ components:
       type: apiKey
       in: header
       name: Authorization
+      description: You must prefix this header with `client_id` before your key. This can be set in the API's configuration at initialization in either the `api_key_prefix` or `apiKeyPrefix` field depending on the language you're using. See `Getting Started` in the README of the generated library for how to set the prefix.
   schemas:
     Challenge:
       title: Challenge

@@ -1,6 +1,6 @@
-# Unofficial Pocket Bitcoin OpenAPI Generator
+# Unofficial Pocket Bitcoin OpenAPI Specification
 
-This repository contains an OpenAPI yaml file to automatically generate API wrappers and reference docs for the Pocket Bitcoin API. This file was not created by Pocket Bitcoin, nor is it supported by them. Use this as you wish, but be mindful it is unsupported and not necessarily production grade.
+This repository contains an OpenAPI YAML document to automatically generate API wrappers and reference docs for the Pocket Bitcoin API. This file was not created by Pocket Bitcoin, nor is it supported by them. Use this as you wish, but be mindful it is unsupported and not necessarily production grade.
 
 * [Contact Pocket Bitcoin](https://pocketbitcoin.com/contact) to get API credentials.
 * [Official Pocket Bitcoin API Docs](https://pocketbitcoin.com/developers)
